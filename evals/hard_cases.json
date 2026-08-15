@@ -1,0 +1,267 @@
+{
+  "_readme": [
+    "难例组（hard cases）—— 和 cases.json 是两台不同的仪器，别混着看。",
+    "",
+    "  cases.json    回归闸门。全绿是常态，红了说明**退化**了，必须修。",
+    "  hard_cases.json 能力基线。它一开始就不是全绿，也不该逼着变全绿。",
+    "",
+    "为什么要分开：Router 评测长期停在 32/32，看着漂亮，实际上意味着",
+    "这套用例已经不能区分任何东西了——拿它去对照规则路由和 LLM 路由，",
+    "只会得到 32/32 对 32/32。一个满分的评测集，等于没有评测集。",
+    "",
+    "但把难例直接塞进闸门也不行：闸门长期红着，最后一定会被人 disable 掉，",
+    "连带着那些真正该守的回归用例一起失效。所以难例组**不参与退出码**，",
+    "只报一个通过率。它回答的是「现在做到哪一步了」，不是「有没有坏」。",
+    "",
+    "期望值写的是**正确的行为**，不是当前的行为。凡是现在做不到的，",
+    "就让它红着——红着的用例是待办事项，改成绿的才是自欺。",
+    "",
+    "字段：",
+    "  expect_intents      意图集合（顺序无关）",
+    "  expect              槽位逐项比对（origin/destination/travel_date/place/scope）",
+    "  expect_missing      缺失字段集合",
+    "  expect_out_of_scope 应当判为超出能力范围",
+    "  expect_clarify      应当去问，而不是自行决定（missing/warnings 非空即可）",
+    "  expect_notice       warnings 里必须提到的字样"
+  ],
+  "改写": [
+    {
+      "id": "H-R1",
+      "input": "上海→成都 8/28 啥时候下手合适",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "上海",
+        "destination": "成都",
+        "travel_date": "2026-08-28"
+      },
+      "why": "箭头是中文互联网里最常见的航线写法之一，规则里一个都没有"
+    },
+    {
+      "id": "H-R2",
+      "input": "帮我看看这两天飞成都的票价走势，我从上海出发，28 号走",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "上海",
+        "destination": "成都",
+        "travel_date": "2026-08-28"
+      },
+      "why": "出发地写在后半句。正则只认「从A飞B」的紧邻结构，隔一个逗号就丢"
+    },
+    {
+      "id": "H-R3",
+      "input": "想在八月二十八号那天从上海去成都，机票现在买还是再等等",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "上海",
+        "destination": "成都",
+        "travel_date": "2026-08-28"
+      },
+      "why": "中文数字日期。口语里比阿拉伯数字更常见，尤其是长辈"
+    },
+    {
+      "id": "H-R4",
+      "input": "我打算月底去趟成都，从上海过去，票怎么买划算",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "上海",
+        "destination": "成都",
+        "travel_date": "2026-08-31"
+      },
+      "why": "「从上海过去」不含飞行动词，航线正则接不住"
+    }
+  ],
+  "噪声": [
+    {
+      "id": "H-N1",
+      "input": "在吗？想问下 8月28号从上海飞成都的机票 谢谢！！！",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "上海",
+        "destination": "成都",
+        "travel_date": "2026-08-28"
+      },
+      "why": "正向锚点：寒暄与标点噪声不该影响抽取。它现在是绿的，"
+    },
+    {
+      "id": "H-N2",
+      "input": "（急）8.28 上海-成都 求助 机票什么时候买最便宜 在线等",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "上海",
+        "destination": "成都",
+        "travel_date": "2026-08-28"
+      },
+      "why": "「8.28」这种点号日期和「A-B」这种连字符航线，规则都不认"
+    },
+    {
+      "id": "H-N3",
+      "input": "我朋友说八月底机票会跌，我8月28号从上海飞成都，是这样吗",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "上海",
+        "destination": "成都",
+        "travel_date": "2026-08-28"
+      },
+      "why": "正向锚点：句子里有两个时间表达（八月底 / 8月28号），不能被前一个带偏"
+    }
+  ],
+  "否定与冲突": [
+    {
+      "id": "H-C1",
+      "input": "别给我查机票，我就想知道成都有什么好玩的",
+      "expect_intents": [
+        "destination"
+      ],
+      "expect": {
+        "place": "成都",
+        "scope": "city"
+      },
+      "why": "「别查机票」是显式否定，却因为句子里有「机票」二字而被判成机票意图。关键词法的典型失效"
+    },
+    {
+      "id": "H-C2",
+      "input": "不去成都了，改去重庆，8月28号从上海出发",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "上海",
+        "destination": "重庆",
+        "travel_date": "2026-08-28"
+      },
+      "why": "同一句里先否定后修正。取到「成都」是取了被用户撤回的那个值"
+    },
+    {
+      "id": "H-C3",
+      "input": "8月28号从上海飞成都，不对，是从北京飞",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "北京",
+        "destination": "成都",
+        "travel_date": "2026-08-28"
+      },
+      "why": "单句自我纠错。多轮路径上这条已经处理了（Batch B），单句路径没有——同一种意图，两条路走法不一样"
+    }
+  ],
+  "超出范围": [
+    {
+      "id": "H-S1",
+      "input": "从上海飞成都的高铁票什么时候买划算",
+      "expect_out_of_scope": true,
+      "why": "「高铁票」明确超范围，却因为有「飞」和「票」被当成机票办了。这正是 README 里「不擅自扩大范围」禁止的那件事——用相近能力硬凑"
+    },
+    {
+      "id": "H-S2",
+      "input": "8月28号从上海飞成都，另外成都有什么好玩的，顺便订个酒店",
+      "expect_intents": [
+        "flight",
+        "destination"
+      ],
+      "expect_notice": [
+        "酒店"
+      ],
+      "why": "两件能做、一件不能做。能做的照做是对的，但不能做的那件必须说出来——静默忽略等于让用户以为订上了"
+    },
+    {
+      "id": "H-S3",
+      "input": "改成29号",
+      "expect_out_of_scope": true,
+      "why": "正向锚点：脱离上下文的片段无从判断，判超范围（而不是猜一个日期）是对的"
+    }
+  ],
+  "日期表达": [
+    {
+      "id": "H-D1",
+      "input": "下周五从上海飞成都",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "上海",
+        "destination": "成都",
+        "travel_date": "2026-08-14"
+      },
+      "why": "评测基准日是 2026-08-05（周三），「下周五」应当是下一周的周五 08-14。实际拿到 08-12——那是个周三，说明规则做的是 today+7，「五」这个字根本没参与计算。原本我把这条当成正向锚点写的，写完跑一遍才发现它是红的"
+    },
+    {
+      "id": "H-D2",
+      "input": "国庆从上海飞成都",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "上海",
+        "destination": "成都",
+        "travel_date": "2026-10-01"
+      },
+      "why": "节假日名。中国用户订票几乎都说节假日，不说日期"
+    },
+    {
+      "id": "H-D3",
+      "input": "8月28号到9月2号从上海飞成都",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "travel_date": "2026-08-28"
+      },
+      "expect_notice": [
+        "区间",
+        "9月2"
+      ],
+      "why": "日期区间。取起始日是合理的，但把用户说过的返程日静默丢掉不合理——要么用上，要么说一声"
+    }
+  ],
+  "歧义": [
+    {
+      "id": "H-A1",
+      "input": "朝阳有什么好玩的",
+      "expect_clarify": true,
+      "why": "北京朝阳区、辽宁朝阳市、长春朝阳区。直接当成一个城市查，等于替用户做了一个他没做的选择"
+    },
+    {
+      "id": "H-A2",
+      "input": "8月28号从浦东飞双流",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "上海",
+        "destination": "成都",
+        "travel_date": "2026-08-28"
+      },
+      "why": "机场名而非城市名。双流在别名表里（→CTU），浦东不在——同一类输入，认一个不认另一个"
+    },
+    {
+      "id": "H-A3",
+      "input": "从北京飞",
+      "expect_intents": [
+        "flight"
+      ],
+      "expect": {
+        "origin": "北京"
+      },
+      "expect_missing": [
+        "destination",
+        "travel_date"
+      ],
+      "why": "只说了出发地。航线正则要求必须有目的地，于是连说出来的那半也一起丢了——丢掉用户明确说过的信息，比没抽到更糟"
+    }
+  ]
+}

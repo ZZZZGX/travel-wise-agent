@@ -1,0 +1,197 @@
+# TravelWise CI
+#
+# 这个仓库的卖点是「评测驱动」，那么评测就必须是**每次 push 都会跑**的东西，
+# 而不是作者本地心情好的时候跑一次。所以这里把四件事都钉进流水线：
+#
+#   1. 单元测试            —— 代码没坏
+#   2. Router / Agent 评测 —— 行为没退化
+#   3. 一致性校验          —— README 自称的数字没漂
+#   4. 凭证扫描            —— 没有 Key 混进仓库
+#
+# 第 3 和第 4 项是这次专门补的：上一版 README 写 112 项测试而实跑 235 项，
+# 打包出去的 zip 里带着明文 API Key。两件事都不是「有人写错了」，
+# 而是「没有任何东西在检查」。现在有了。
+#
+# 关于 LLM：CI 里**不配任何 API Key**，评测强制走 scripted 离线回放。
+# 真机对照实验属于另一个口径，人工触发（见 workflow_dispatch 里的 real-model 任务）。
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  PYTHONIOENCODING: utf-8
+  # 覆盖掉可能从 .env 读到的配置，保证 CI 的数字是「clone 下来就能复现」的那个
+  TRAVELWISE_LLM_PROVIDER: scripted
+
+jobs:
+  test:
+    name: 测试 · Python ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      # 运行时零第三方依赖，所以这里没有 pip install -r requirements.txt。
+      # 若哪天这一步变得必要，说明「零依赖」这个说法该从 README 里撤掉了。
+      - name: 确认运行时零依赖
+        run: |
+          python -c "import sys; print(sys.version)"
+          test ! -s requirements.txt || echo "requirements.txt 非空，注意 README 的零依赖声明"
+
+      - name: 单元测试
+        run: python -m unittest discover -s tests -v
+        env:
+          PYTHONPATH: src
+
+      - name: 可安装性（pip install -e .）
+        run: |
+          python -m pip install --upgrade pip build
+          python -m pip install -e .
+          python -c "import travelwise; print('version =', travelwise.__version__)"
+          travelwise --demo > /dev/null
+
+  evals:
+    name: 评测（离线口径）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 回归闸门红了就是退化；难例组随之打印，但不参与退出码
+      # （理由见 evals/hard_cases.json 开头：闸门长期红着就会被人关掉）。
+      - name: Router 评测（回归闸门 + 难例组）
+        run: python evals/run_evals.py
+        env:
+          PYTHONPATH: src
+
+      # 退出码有三档，不要合并成「非 0 就红」：
+      #   0 = 全过
+      #   1 = 有用例不通过（模型/代码的问题）
+      #   2 = 探测器自检没过（**尺子本身不准**，此时用例结果无意义）
+      # 2 单独拎出来是因为它要求的动作完全不同：修评测器，而不是修 Agent。
+      - name: Agent 评测
+        run: |
+          set +e
+          python evals/run_agent_evals.py
+          code=$?
+          set -e
+          if [ "$code" = "2" ]; then
+            echo "::error::违规探测器自检未通过 —— 先修 evals 里的探测规则，本次用例结果不可信"
+          fi
+          exit $code
+        env:
+          PYTHONPATH: src
+
+      # 可观测性最容易烂在「写好了但没人跑」上 —— 上一版 tracing.py 就是这么
+      # 躺了一整个版本的。这一步跑一次真的埋点、真的渲染，任何一环断了 CI 就红。
+      - name: Trace 落盘与渲染
+        run: |
+          set -e
+          python -m travelwise --trace --today 2026-08-14 \
+            "8月28号从上海飞乌鲁木齐，新疆有什么玩的" > /dev/null
+          python scripts/view_trace.py --latest
+          test -n "$(ls data/cache/traces/*.html)"
+        env:
+          PYTHONPATH: src
+          TRAVELWISE_FLIGHT_PROVIDER: mock
+
+      - name: 归档评测结果
+        if: always()
+        run: |
+          mkdir -p evals/results
+          python evals/run_evals.py --json > evals/results/router.json || true
+          python evals/run_agent_evals.py --json > evals/results/agent.json || true
+        env:
+          PYTHONPATH: src
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-results
+          path: evals/results/
+          if-no-files-found: ignore
+
+  consistency:
+    name: 一致性 · README 数字 / 版本号
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 对不上就红。这一步存在的意义是：让「README 吹牛」变成一次构建失败。
+      - name: 校验 README 与实跑结果一致
+        run: python scripts/check_consistency.py
+        env:
+          PYTHONPATH: src
+
+  secrets:
+    name: 凭证扫描
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 仓库里不应存在 .env / 私钥
+        run: |
+          set -e
+          bad=$(git ls-files | grep -E '(^|/)\.env$|(^|/)\.env\.[^e]|\.pem$|\.key$|^config/flight_api\.json$' || true)
+          if [ -n "$bad" ]; then
+            echo "❌ 以下文件不该被提交："
+            echo "$bad"
+            exit 1
+          fi
+          echo "✅ 未发现被提交的凭证文件"
+
+      - name: 打包预演（分发包不夹带凭证）
+        run: python scripts/pack_release.py --dry-run
+
+  real-model:
+    # 真机对照实验：只在手动触发时跑，且必须有 Key。
+    # 不放进 push 流水线的理由有三个：要花钱、结果不确定、fork 的 PR 拿不到 secret。
+    # 把它和常规 CI 混在一起，最后一定会因为「时红时绿」被人 disable 掉。
+    name: 真实模型对照（手动）
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 冒烟 + 对照
+        env:
+          PYTHONPATH: src
+          TRAVELWISE_LLM_PROVIDER: ${{ secrets.TRAVELWISE_LLM_PROVIDER }}
+          TRAVELWISE_LLM_API_KEY: ${{ secrets.TRAVELWISE_LLM_API_KEY }}
+          TRAVELWISE_LLM_MODEL: ${{ secrets.TRAVELWISE_LLM_MODEL }}
+          TRAVELWISE_LLM_BASE_URL: ${{ secrets.TRAVELWISE_LLM_BASE_URL }}
+        run: |
+          python scripts/smoke_real_llm.py
+          python evals/run_agent_evals.py --json > agent-real.json || true
+          python evals/compare_routers.py || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-model-results
+          path: agent-real.json
+          if-no-files-found: ignore

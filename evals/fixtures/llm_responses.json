@@ -1,0 +1,686 @@
+{
+  "_README": "⚠️ 这是【人工录制的合成响应】，不是真实模型输出。用途是让 Tool Calling 链路在无 API Key 时也能跑通、能进 CI、能写断言。用它跑出的 LLM 路由准确率【不构成模型能力的证据】——因为这批基准值是照着规则路由的解析结果录的，两者本就一致。真实对照必须配置 TRAVELWISE_LLM_PROVIDER=anthropic|openai 与 TRAVELWISE_LLM_API_KEY。",
+  "_today": "2026-08-05",
+  "_recorded_from": "rule-router baseline output (synthetic)",
+  "responses": {
+    "月底上海去北京。": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight"
+            ],
+            "origin": "上海",
+            "destination": "北京",
+            "travel_date": "2026-08-31"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 336,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "8月28号从上海飞成都的机票": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight"
+            ],
+            "origin": "上海",
+            "destination": "成都的机票",
+            "travel_date": "2026-08-28"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 348,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "成都秋天有什么地方适合玩？": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "destination"
+            ],
+            "place": "成都",
+            "scope": "city"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 346,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "沈阳有什么好玩的？": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "destination"
+            ],
+            "place": "沈阳",
+            "scope": "city"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 338,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "月底去成都，顺便看看四川有什么玩的。": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight",
+              "destination"
+            ],
+            "destination": "成都",
+            "travel_date": "2026-08-31",
+            "place": "四川",
+            "scope": "province"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 356,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "我下周要去新疆": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight",
+              "destination"
+            ],
+            "destination": "新疆",
+            "travel_date": "2026-08-12",
+            "place": "新疆",
+            "scope": "province"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 334,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "帮我订个酒店": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": []
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 332,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "帮我查下火车票": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": []
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 334,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "今天天气怎么样": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": []
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 334,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "8月28号从上海飞成都": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight"
+            ],
+            "origin": "上海",
+            "destination": "成都",
+            "travel_date": "2026-08-28"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 342,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "明天从北京去广州": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight"
+            ],
+            "origin": "北京",
+            "destination": "广州",
+            "travel_date": "2026-08-06"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 336,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "月底飞乌鲁木齐": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight"
+            ],
+            "destination": "乌鲁木齐",
+            "travel_date": "2026-08-31"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 334,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "我想买张机票": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight"
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 332,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "沈阳有什么玩的？": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "destination"
+            ],
+            "place": "沈阳",
+            "scope": "city"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 336,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "新疆有什么好玩的": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "destination"
+            ],
+            "place": "新疆",
+            "scope": "province"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 336,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "8月28号飞乌鲁木齐，新疆有什么玩的": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight",
+              "destination"
+            ],
+            "destination": "乌鲁木齐",
+            "travel_date": "2026-08-28",
+            "place": "新疆",
+            "scope": "province"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 356,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "云南有什么好玩的": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "destination"
+            ],
+            "place": "云南",
+            "scope": "province"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 336,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "大连有什么好玩的": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "destination"
+            ],
+            "place": "大连",
+            "scope": "city"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 336,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "8月28号从北京飞广州": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight"
+            ],
+            "origin": "北京",
+            "destination": "广州",
+            "travel_date": "2026-08-28"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 342,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "8月28号从北京飞广州，看到合适的直接帮我设置提醒": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight"
+            ],
+            "origin": "北京",
+            "destination": "广州",
+            "travel_date": "2026-08-28"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 370,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "去一个不存在的城市玩": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight",
+              "destination"
+            ],
+            "destination": "一个不存在的城市",
+            "place": "一个不存在的城市",
+            "scope": "city"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 340,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "库尔勒有什么好玩的": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "destination"
+            ],
+            "place": "库尔勒",
+            "scope": "city"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 338,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "8月28号从上海飞成都，成都有什么好玩的": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight",
+              "destination"
+            ],
+            "origin": "上海",
+            "destination": "成都",
+            "travel_date": "2026-08-28",
+            "place": "成都",
+            "scope": "city"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 360,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "下周去大连": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight",
+              "destination"
+            ],
+            "destination": "大连",
+            "travel_date": "2026-08-12",
+            "place": "大连",
+            "scope": "city"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 330,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "我要去": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": []
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 326,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "8月28号从上海飞成都，机票什么时候买划算": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight"
+            ],
+            "origin": "上海",
+            "destination": "成都",
+            "travel_date": "2026-08-28"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 362,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "8月28号从北京飞广州，帮我设个购票提醒": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight"
+            ],
+            "origin": "北京",
+            "destination": "广州",
+            "travel_date": "2026-08-28"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 360,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    },
+    "月底从上海飞成都，四川有什么好玩的": {
+      "text": "",
+      "tool_calls": [
+        {
+          "name": "plan_travel_request",
+          "arguments": {
+            "intents": [
+              "flight",
+              "destination"
+            ],
+            "origin": "上海",
+            "destination": "成都",
+            "travel_date": "2026-08-31",
+            "place": "四川",
+            "scope": "province"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 354,
+        "output_tokens": 45
+      },
+      "stop_reason": "tool_use"
+    }
+  },
+  "agent_loop_responses": {
+    "沈阳有什么好玩的": {
+      "tool_calls": [
+        {
+          "name": "search_destination",
+          "id": "toolu_sy01",
+          "arguments": {
+            "place": "沈阳",
+            "scope": "city"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 620,
+        "output_tokens": 55
+      },
+      "stop_reason": "tool_use"
+    },
+    "8月28号从上海飞成都，机票什么时候买划算": {
+      "tool_calls": [
+        {
+          "name": "search_flights",
+          "id": "toolu_fl01",
+          "arguments": {
+            "origin": "上海",
+            "destination": "成都",
+            "travel_date": "2026-08-28"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 640,
+        "output_tokens": 60
+      },
+      "stop_reason": "tool_use"
+    },
+    "8月28号从上海飞乌鲁木齐，新疆有什么玩的": {
+      "tool_calls": [
+        {
+          "name": "search_flights",
+          "id": "toolu_fl02",
+          "arguments": {
+            "origin": "上海",
+            "destination": "乌鲁木齐",
+            "travel_date": "2026-08-28"
+          }
+        },
+        {
+          "name": "search_destination",
+          "id": "toolu_xj01",
+          "arguments": {
+            "place": "新疆",
+            "scope": "province",
+            "travel_month": 8
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 680,
+        "output_tokens": 95
+      },
+      "stop_reason": "tool_use"
+    },
+    "8月28号从北京飞广州，帮我设个购票提醒": {
+      "tool_calls": [
+        {
+          "name": "search_flights",
+          "id": "toolu_fl03",
+          "arguments": {
+            "origin": "北京",
+            "destination": "广州",
+            "travel_date": "2026-08-28"
+          }
+        },
+        {
+          "name": "create_reminder",
+          "id": "toolu_rm01",
+          "arguments": {
+            "title": "购买 北京→广州 机票",
+            "remind_date": "2026-08-19",
+            "note": "按同星期几对齐法给出的建议购票日"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 700,
+        "output_tokens": 110
+      },
+      "stop_reason": "tool_use"
+    },
+    "帮我订个从上海到成都的酒店": {
+      "text": "抱歉，我只能做机票购票时机分析和目的地景区推荐，订酒店超出了我的能力范围，没有对应的工具可用。",
+      "tool_calls": [],
+      "usage": {
+        "input_tokens": 600,
+        "output_tokens": 48
+      },
+      "stop_reason": "end_turn"
+    }
+  },
+  "agent_loop_followup": {
+    "text": "已根据工具返回的结果整理如下。工具给出的警告均已如实保留，未做任何补充或推测；若其中有失败项，我会直接说明失败原因而不是给出替代数字。涉及需要确认的操作，请在你确认后我才会继续。",
+    "usage": {
+      "input_tokens": 1500,
+      "output_tokens": 185
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "_readme": "TravelWise 评测集。每条用例声明输入与期望，由 evals/run_evals.py 执行并给出通过率。新增用例只改本文件，不改代码。",
+  "intent_routing": [
+    {"id": "IR-01", "input": "月底上海去北京。", "expect_intents": ["flight"], "note": "含地名与出行动词"},
+    {"id": "IR-02", "input": "8月28号从上海飞成都的机票", "expect_intents": ["flight"]},
+    {"id": "IR-03", "input": "成都秋天有什么地方适合玩？", "expect_intents": ["destination"]},
+    {"id": "IR-04", "input": "沈阳有什么好玩的？", "expect_intents": ["destination"]},
+    {"id": "IR-05", "input": "月底去成都，顺便看看四川有什么玩的。", "expect_intents": ["flight", "destination"]},
+    {"id": "IR-06", "input": "我下周要去新疆", "expect_intents": ["flight", "destination"], "note": "强出行信号，未明说要什么"},
+    {"id": "IR-07", "input": "帮我订个酒店", "expect_intents": [], "note": "超出能力范围，应拒绝"},
+    {"id": "IR-08", "input": "帮我查下火车票", "expect_intents": [], "note": "超出能力范围"},
+    {"id": "IR-09", "input": "今天天气怎么样", "expect_intents": [], "note": "闲聊，不触发"}
+  ],
+  "parameter_extraction": [
+    {"id": "PE-01", "input": "8月28号从上海飞成都", "expect": {"origin": "上海", "destination": "成都", "travel_date": "2026-08-28"}},
+    {"id": "PE-02", "input": "明天从北京去广州", "expect": {"origin": "北京", "destination": "广州", "travel_date": "2026-08-06"}},
+    {"id": "PE-03", "input": "月底飞乌鲁木齐", "expect": {"destination": "乌鲁木齐", "travel_date": "2026-08-31"}},
+    {"id": "PE-04", "input": "我想买张机票", "expect_missing": ["origin", "destination", "travel_date"], "note": "缺失必须被识别，不许瞎猜"}
+  ],
+  "scope_control": [
+    {"id": "SC-01", "input": "沈阳有什么玩的？", "expect_scope": "city", "expect_place": "沈阳", "note": "结果少也不许扩成辽宁"},
+    {"id": "SC-02", "input": "新疆有什么好玩的", "expect_scope": "province", "expect_place": "新疆"},
+    {"id": "SC-03", "input": "8月28号飞乌鲁木齐，新疆有什么玩的", "expect_scope": "province", "expect_place": "新疆", "expect_destination": "乌鲁木齐", "note": "落地城市 ≠ 玩乐范围"},
+    {"id": "SC-04", "input": "云南有什么好玩的", "expect_scope": "province", "expect_place": "云南"},
+    {"id": "SC-05", "input": "大连有什么好玩的", "expect_scope": "city", "expect_place": "大连"}
+  ],
+  "tool_failure": [
+    {"id": "TF-01", "mode": "timeout", "input": "8月28号从上海飞成都的机票", "expect_ok": false, "expect_error_contains": "超时", "forbid_fabrication": true},
+    {"id": "TF-02", "mode": "http_500", "input": "8月28号从上海飞成都的机票", "expect_ok": false, "expect_error_contains": "500", "forbid_fabrication": true},
+    {"id": "TF-03", "mode": "auth", "input": "8月28号从上海飞成都的机票", "expect_ok": false, "expect_error_contains": "401", "forbid_fabrication": true},
+    {"id": "TF-04", "mode": "malformed", "input": "8月28号从上海飞成都的机票", "expect_ok": false, "expect_error_contains": "JSON", "forbid_fabrication": true},
+    {"id": "TF-05", "mode": "empty", "input": "8月28号从上海飞成都的机票", "expect_ok": true, "note": "连上但当日无航班：是空结果不是错误"}
+  ],
+  "human_in_the_loop": [
+    {"id": "HL-01", "input": "8月28号从北京飞广州", "want_reminder": true, "approval": null, "expect_executed": false, "note": "无审批回调则绝不执行"},
+    {"id": "HL-02", "input": "8月28号从北京飞广州，看到合适的直接帮我设置提醒", "want_reminder": true, "approval": true, "expect_executed": true, "expect_preview": true, "note": "用户说'直接设'也必须先预览"},
+    {"id": "HL-03", "input": "8月28号从北京飞广州", "want_reminder": true, "approval": false, "expect_executed": false, "note": "拒绝后不得执行"}
+  ],
+  "edge_cases": [
+    {"id": "EC-01", "input": "去一个不存在的城市玩", "expect_no_crash": true, "note": "不存在的目的地"},
+    {"id": "EC-02", "input": "库尔勒有什么好玩的", "expect_scope": "city", "expect_no_crash": true, "note": "名录按所属州收录，应如实说未收录而非自动扩省"},
+    {"id": "EC-03", "input": "8月28号从上海飞成都，成都有什么好玩的", "expect_intents": ["flight", "destination"], "expect_no_crash": true, "note": "多意图 + 同名城市"},
+    {"id": "EC-04", "input": "下周去大连", "expect_no_crash": true, "note": "相对时间"},
+    {"id": "EC-05", "input": "", "expect_no_crash": true, "note": "空输入"},
+    {"id": "EC-06", "input": "我要去", "expect_no_crash": true, "note": "残缺句"}
+  ]
+}

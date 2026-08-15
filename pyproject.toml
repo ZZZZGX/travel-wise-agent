@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "travelwise-agent"
+dynamic = ["version"]
+description = "Evaluation-driven AI travel agent：机票购票时机启发式分析 + 目的地策展"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["ai-agent", "travel", "evaluation", "tool-use", "mcp"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+]
+dependencies = []
+
+[project.scripts]
+travelwise = "travelwise.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# 版本号不在这里手写。setuptools 会静态读取 src/travelwise/_version.py 里的
+# VERSION 字面量（不会 import 包，所以不受 __init__ 的副作用影响）。
+# 想改版本号 → 只改 _version.py 一处；scripts/check_consistency.py 负责在 CI 里
+# 校验 README badge 没有落后。
+[tool.setuptools.dynamic]
+version = { attr = "travelwise._version.VERSION" }

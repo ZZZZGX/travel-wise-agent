@@ -1,0 +1,33 @@
+{
+  "_comment": "航班接口配置模板。复制为 flight_api.json 后按所用接口文档填写。凭证不写这里——放环境变量 TRAVELWISE_FLIGHT_TOKEN。",
+  "name": "your-flight-api",
+  "endpoint": "https://example.com/api/flights",
+  "method": "GET",
+  "body_format": "form",
+  "supports_price": true,
+  "date_format": "YYYY-MM-DD",
+  "params": {
+    "origin_key": "from",
+    "destination_key": "to",
+    "date_key": "date"
+  },
+  "extra_params": {},
+  "auth": {
+    "type": "header",
+    "key": "Authorization",
+    "prefix": "Bearer",
+    "value_env": "TRAVELWISE_FLIGHT_TOKEN"
+  },
+  "response": {
+    "list_path": "data.flights",
+    "price_field": "",
+    "field_map": {
+      "flight_no": "flightNo",
+      "airline": "airlineName",
+      "departure_time": "depTime",
+      "arrival_time": "arrTime"
+    }
+  },
+  "_auth_types": "header（自定义头，可配 prefix）| bearer | query（拼到 URL）| none",
+  "_note": "list_path 留空则自动探测常见容器；field_map 留空则按内置别名表自动认领。生产环境建议设 TRAVELWISE_STRICT_FIELDS=1 强制显式映射，避免猜错字段却仍能运行。"
+}

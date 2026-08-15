@@ -1,0 +1,6 @@
+# TravelWise 当前运行时零第三方依赖 —— 只用 Python 标准库。
+# clone 下来即可 python -m travelwise --demo，无需 pip install。
+#
+# 注意：Roadmap 中的 LLM Function Calling 与 RAG 阶段会引入依赖
+#（如 openai/anthropic SDK、向量库），届时在此追加，
+# 并同步更新 README 中"零依赖"的表述。

@@ -1,0 +1,33 @@
+# ---- 凭证：绝对不要提交 ----
+.env
+.env.*
+!.env.example
+config/flight_api.json
+config/web_search_api.json
+config/api_keys.json
+secrets.*
+*.pem
+
+# ---- 运行时产物 ----
+data/cache/
+!data/cache/.gitkeep
+evals/results/
+*.db
+*.sqlite3
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+
+# ---- 编辑器 / 系统 ----
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

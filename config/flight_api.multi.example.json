@@ -1,0 +1,75 @@
+{
+  "_comment": "两个航班接口的容错链配置。复制为 flight_api.json 后按各自文档填写。凭证一律不写这里——只写环境变量名。",
+  "_how_it_works": "providers 数组按顺序尝试：第一家抛错（超时/401/429/格式变更）才换第二家；第一家返回空列表视为『当天确实没航班』，不会再打第二家浪费额度。",
+
+  "providers": [
+    {
+      "name": "aliyun-primary",
+      "enabled": true,
+      "endpoint": "https://你的商品域名.market.alicloudapi.com/接口路径",
+      "method": "GET",
+      "supports_price": true,
+      "date_format": "YYYY-MM-DD",
+      "params": {
+        "origin_key": "dep",
+        "destination_key": "arr",
+        "date_key": "date"
+      },
+      "extra_params": {},
+      "auth": {
+        "type": "header",
+        "key": "Authorization",
+        "prefix": "APPCODE",
+        "value_env": "TRAVELWISE_FLIGHT_TOKEN"
+      },
+      "response": {
+        "list_path": "data",
+        "price_field": "",
+        "field_map": {
+          "flight_no": "FLIGHT_ID",
+          "airline": "FLIGHT_AIRWAYS_CH",
+          "departure_time": "START_TIME",
+          "arrival_time": "END_TIME",
+          "departure_date": "START_DATE"
+        }
+      }
+    },
+    {
+      "name": "backup-api",
+      "enabled": true,
+      "endpoint": "https://第二家的域名/接口路径",
+      "method": "GET",
+      "supports_price": true,
+      "date_format": "YYYYMMDD",
+      "params": {
+        "origin_key": "from",
+        "destination_key": "to",
+        "date_key": "flightDate"
+      },
+      "extra_params": {},
+      "auth": {
+        "type": "query",
+        "key": "key",
+        "value_env": "TRAVELWISE_FLIGHT_TOKEN_BACKUP"
+      },
+      "response": {
+        "list_path": "result.list",
+        "price_field": "",
+        "field_map": {
+          "flight_no": "flightNo",
+          "airline": "airlineName",
+          "departure_time": "depTime",
+          "arrival_time": "arrTime"
+        }
+      }
+    }
+  ],
+
+  "_notes": [
+    "auth.type：header（自定义头，阿里云云市场多为 Authorization: APPCODE xxx）| bearer | query（拼到 URL）| none",
+    "每家的 value_env 必须写不同的变量名，否则两家会共用同一个凭证。",
+    "两家的 price_field 都要指向『最低可售价』而不是『全价』——先跑 scripts/probe_flight_api.py 确认。",
+    "两家字段口径不同时不要混着用：容错链只在整天失败时切换，不会把两家的航班拼进同一天。",
+    "enabled 设为 false 可临时停用某一家，不必删配置。"
+  ]
+}
